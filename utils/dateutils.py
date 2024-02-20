@@ -27,6 +27,5 @@ def get_current_month_dates(date: datetime) -> Generator[datetime, None, None]:
         yield current_date 
         current_date += one_day_delta
 
-
 if __name__ == "__main__":
     print([date for date in get_current_month_dates(get_current_date())])
