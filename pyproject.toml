@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "kgeu-2d-su-to-ics-json"
+version = "0.1.0"
+description = ""
+authors = ["c4chula <henry.foster71@yahoo.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiohttp = "^3.9.3"
+pydantic = "^2.6.1"
+icalendar = "^5.0.11"
+pytz = "^2024.1"
+click = "^8.1.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
