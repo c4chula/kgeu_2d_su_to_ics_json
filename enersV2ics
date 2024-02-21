@@ -1,0 +1,37 @@
+#!usr/bin/env python
+
+import asyncio
+from utils.api import EnersV2Api
+from utils.schema import EnersV2ApiData, EventInfo
+from utils.ics import ENERSv2ICalendar
+import click
+
+
+@click.command(name="get")
+@click.option('--week/--month', default=True)
+@click.option('--next', is_flag=True)
+@click.argument('GROUP_NAME', required=True)
+@click.argument('FILE_NAME', default="file.ics")
+def get_ics(week: click.Option, next: click.Option, group_name: str, file_name: str):
+    eners = EnersV2Api(
+       EnersV2ApiData(
+           domain="http://kgeu.2d.su/api",
+           route="/schedule.php",
+           group_name=group_name,
+           )
+       )
+    events: list[EventInfo] = []
+    if week and not next:
+        events = asyncio.run(eners.get_current_week_schedule())
+    elif week and next:
+        events = asyncio.run(eners.get_next_week_schedule())
+    elif not week and not next:
+        events = asyncio.run(eners.get_current_month_schedule())
+    elif not week and next:
+        events = asyncio.run(eners.get_next_month_schedule())
+
+    cal = ENERSv2ICalendar(events)
+    cal.create_ics_file()
+
+if __name__ == "__main__":
+    get_ics()
