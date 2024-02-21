@@ -1,5 +1,5 @@
 import functools
-import operator
+import pytz as pz
 from typing import Any, Callable, Generator
 from datetime import datetime
 from typing import AsyncGenerator
@@ -13,8 +13,6 @@ from .dateutils import (
     one_month_delta,
 )
 import asyncio
-from pprint import pprint
-import itertools
 from .schema import EnersV2ApiData, EventInfo
 
 
@@ -72,7 +70,6 @@ class EnersV2Api:
                 )
 
             data = await asyncio.gather(*tasks)
-            pprint(data)
             return data
 
     def _request_to_model(self, data: list[dict[str, Any]]) -> list[EventInfo]:
@@ -81,17 +78,17 @@ class EnersV2Api:
                 start_datetime=datetime.strptime(
                     f"{date_str} {event['start_time']}",
                     "%Y-%m-%d %H:%M",
-                ),
+                ).astimezone(tz=pz.timezone("Europe/Moscow")),
                 end_datetime=datetime.strptime(
                     f"{date_str} {event['end_time']}",
                     "%Y-%m-%d %H:%M",
-                ),
+                ).astimezone(tz=pz.timezone("Europe/Moscow")),
                 subject="%s %s" % (event["type"], event["subject"]),
                 teacher=event["teacher"],
                 auditory=event["auditory"],
             )
             for event, date_str in [
-                (event, list(sublist["schedule"].items())[0][0]) 
+                (event, list(sublist["schedule"].items())[0][0])
                 for sublist in data
                 if sublist["status"] == "success"
                 for event in list(sublist["schedule"].items())[0][1]
